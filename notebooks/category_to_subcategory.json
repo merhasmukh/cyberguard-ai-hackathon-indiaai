@@ -1,0 +1,78 @@
+{
+    "any other cyber crime": [
+        "other"
+    ],
+    "crime against women & children": [
+        "cyber blackmailing & threatening",
+        "sexual harassment",
+        "computer generated csam/csem"
+    ],
+    "cryptocurrency crime": [
+        "cryptocurrency fraud"
+    ],
+    "cyber attack/ dependent crimes": [
+        "tampering with computer source documents",
+        "hacking/defacement",
+        "malware attack",
+        "ransomware attack",
+        "data breach/theft",
+        "sql injection",
+        "denial of service (dos)/distributed denial of service (ddos) attacks"
+    ],
+    "cyber terrorism": [
+        "cyber terrorism"
+    ],
+    "hacking  damage to computer system etc": [
+        "tampering with computer source documents",
+        "unauthorised access/data breach",
+        "damage to computer systems",
+        "defacement/hacking",
+        "email hacking"
+    ],
+    "hacking  damage to computercomputer system etc": [
+        "tampering with computer source documents",
+        "unauthorised access/data breach",
+        "damage to computer systems",
+        "defacement/hacking",
+        "email hacking"
+    ],
+    "online and social media related crime": [
+        "email phishing",
+        "impersonating email",
+        "online job fraud",
+        "intimidating email",
+        "cyber bullying/stalking/sexting",
+        "profile hacking identity theft",
+        "fakeimpersonating profile",
+        "provocative speech for unlawful acts",
+        "online matrimonial fraud",
+        "cheating by impersonation"
+    ],
+    "online cyber trafficking": [
+        "online trafficking"
+    ],
+    "online financial fraud": [
+        "ewallet related fraud",
+        "debit/credit card fraud or sim swap fraud",
+        "internet banking related fraud",
+        "demat/depository fraud",
+        "upi related frauds",
+        "business email compromise/email takeover",
+        "fraud call/vishing"
+    ],
+    "online gambling  betting": [
+        "online gambling  betting"
+    ],
+    "ransomware": [
+        "ransomware"
+    ],
+    "report unlawful content": [
+        "against interest of sovereignty or integrity of india"
+    ],
+    "women/child related crime": [
+        "rape/gang rape-sexually abusive content",
+        "sexually obscene material",
+        "child pornography/child sexual abuse material (csam)",
+        "sexually explicit act"
+    ]
+}

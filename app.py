@@ -1,22 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Form
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel,Field
 import joblib
 import uvicorn
 from utils.utils import predict_text
 
 app = FastAPI()
-
-# Load the models
-sub_category_model = joblib.load('./prepare_models/latest_models/sub_category_model.pkl')
-category_model = joblib.load('./prepare_models/latest_models/category_model.pkl')
-
-
-
-class TextRequest(BaseModel):
-    text: str = Field(..., min_length=1, max_length=1000, description="The input text to be processed")
-
-
 
 
 @app.get("/")
@@ -24,25 +12,22 @@ async def health_chech():
     return JSONResponse(content={"message":"API is wokring fine"},status_code=200)
 
 
-@app.post("/predict_model_1",
+@app.post("/second_approach/naive_bayes",
            summary="Predict Category and Subcategory",
-            description="""This endpoint takes a piece of text and predicts the category and subcategory based on the trained model.
+            description="""This endpoint takes a piece of text and predicts the category and subcategory based on the model.
                             \n
-                            Category Accuracy: \n
-                            Sub-Category Accuracy: \n
+                            Category Accuracy: 70% \n
+                            Sub-Category Accuracy: 40% \n
                             replace the string with your text input in given request body.
-                        """,
-)
-async def predict(request: TextRequest):
-    input_text=request.text.lower()
-    # Predict subcategory
-    cleaned_text = " ".join(input_text.splitlines())  # Joins lines into a single line
+                        """)
+async def predict(text: str = Form(...)):
+    input_text=text.lower()
 
-    criminal_info =  [cleaned_text]
+    criminal_info =  [input_text]
 
-    print(criminal_info)
-
-    # Predict the category
+    # Load the models
+    sub_category_model = joblib.load('./latest_models/second_approach/sub_category_model.pkl')
+    category_model = joblib.load('./latest_models/second_approach/category_model.pkl')
     sub_category_prediction = sub_category_model.predict(criminal_info)
     print(f"Sub-Category {sub_category_prediction}")
     predicted_category = category_model.predict(sub_category_prediction)
@@ -56,7 +41,7 @@ async def predict(request: TextRequest):
     },status_code=200)
 
 
-@app.post("/predict_model_2",
+@app.post("/third_approach/lstm",
             summary="Predict Category and Subcategory",
             description="""This endpoint takes a piece of text and predicts the category and subcategory based on the trained model.
                             \n
@@ -64,13 +49,14 @@ async def predict(request: TextRequest):
                             Sub-Category Accuracy: \n
                             replace the string with your text input in given request body.
                         """)          
-async def predict_2(request: TextRequest):
-    input_text=request.text.lower()
-    # Predict subcategory
-    cleaned_text = " ".join(input_text.splitlines())  # Joins lines into a single line
+async def cyber_crime_classify(text: str = Form(...)):
+    input_text=text.lower()
+   
 
-    criminal_info =  [cleaned_text]
+    criminal_info =  [input_text]
+   
 
+    
     predicted_category, sub_category_prediction=predict_text(criminal_info)
     return JSONResponse(content={
         "sub_category": sub_category_prediction,
