@@ -2,47 +2,77 @@
 import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-
-# Load the saved model
-loaded_model = load_model('./utils/multi_output_model.h5')
-loaded_model.compile(
-    loss={
-        'category_output': 'sparse_categorical_crossentropy', 
-        'subcategory_output': 'sparse_categorical_crossentropy'
-    },
-    optimizer='adam',
-    metrics={
-        'category_output': 'accuracy', 
-        'subcategory_output': 'accuracy'
-    })
-# Load the tokenizer (you need to save and load the tokenizer as well)
-# For this example, let's assume you have saved your tokenizer
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 import pickle
+import json
+nltk.download('stopwords')
+nltk.download('wordnet')
+# Step 1: Text Cleaning and Tokenization
+stop_words = set(stopwords.words('english'))
+lemmatizer = WordNetLemmatizer()
 
-# Load the tokenizer
-with open('./utils/tokenizer.pickle', 'rb') as handle:
-    tokenizer = pickle.load(handle)
-
-
-# Load the label encoders from files
-with open('./utils/label_encoder_category.pickle', 'rb') as handle:
-    label_encoder_category = pickle.load(handle)
-
-with open('./utils/label_encoder_subcategory.pickle', 'rb') as handle:
-    label_encoder_subcategory = pickle.load(handle)
 
 def predict_text(input_text):
-    # Tokenize and pad the input text
-    sequence = tokenizer.texts_to_sequences([input_text])
-    padded_sequence = pad_sequences(sequence, maxlen=200)  # Use the same maxlen used during training
+    max_words = 200000
+    max_len = 500
 
+    # Load the saved model
+    model = load_model('./utils/latest_models/third_approach/sub_category_text_classification_model.keras')
+
+    # Load the tokenizer
+    with open('./utils/latest_models/third_approach/sub_category_tokenizer.pickle', 'rb') as handle:
+        tokenizer = pickle.load(handle)
+
+    # Load the label encoder
+    with open('./utils/latest_models/third_approach/label_encoder_sub_category.pickle', 'rb') as handle:
+        label_encoder = pickle.load(handle)
+
+        # Clean and preprocess
+    new_data_cleaned = [clean_text(text) for text in input_text]
+
+    # Convert text to sequences
+    new_sequences = tokenizer.texts_to_sequences(new_data_cleaned)
+    new_padded_sequences = pad_sequences(new_sequences, maxlen=max_len)  
     # Make predictions
-    category_prediction, subcategory_prediction = loaded_model.predict(padded_sequence)
+    predictions = model.predict(new_padded_sequences)
 
-    # Decode the predicted classes
-    category = np.argmax(category_prediction, axis=1)[0]  # Get the predicted category index
-    subcategory = np.argmax(subcategory_prediction, axis=1)[0]  # Get the predicted subcategory index
-    category_label = label_encoder_category.inverse_transform([category])[0]
-    subcategory_label = label_encoder_subcategory.inverse_transform([subcategory])[0]
-    print(category_label,subcategory_label)
+    # Convert predictions to label indices
+    predicted_indices = np.argmax(predictions, axis=1)
+
+    # Decode indices to original category labels
+    predicted_labels = label_encoder.inverse_transform(predicted_indices)
+
+  
+    print(f"Predicted Sub Category: {predicted_labels[0]}")
+    subcategory_label=predicted_labels[0]
+
+    # Load the JSON file
+    with open("./utils/latest_models/third_approach/category_to_subcategory.json", "r") as f:
+        category_to_subcategory = json.load(f)
+
+    # Create a reverse mapping: sub_category -> category
+    subcategory_to_category = {}
+    for category, subcategories in category_to_subcategory.items():
+        for subcategory in subcategories:
+            subcategory_to_category[subcategory] = category
+
+    category_label=subcategory_to_category.get(subcategory_label, "Category not found")
+
+   
+
     return category_label, subcategory_label
+
+
+import re
+def clean_text(text):
+    # Remove special characters, numbers, and punctuation
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    # Convert to lowercase
+    text = text.lower()
+    # Remove stopwords
+    text = ' '.join(word for word in text.split() if word not in stop_words)
+    # Lemmatization
+    text = ' '.join(lemmatizer.lemmatize(word) for word in text.split())
+    return text
