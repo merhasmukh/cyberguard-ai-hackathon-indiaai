@@ -167,3 +167,4 @@ venv/
 *.keras
 *.pickle
 *.json
+uploaded_files/
