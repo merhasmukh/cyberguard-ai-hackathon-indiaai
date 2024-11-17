@@ -166,3 +166,4 @@ venv/
 *.zip
 *.keras
 *.pickle
+*.json
